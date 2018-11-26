@@ -1,0 +1,81 @@
+<html>
+<head>
+	<!-- Import P5 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
+</head>
+<body>
+	<script type='text/javascript'>
+		const CANVAS_SIDE_LENGTH = 800;
+
+		const ISLAND_WIDTH = 80;
+		const ISLAND_HEIGHT = 20;
+		const ISLAND_BUFFER = 10
+
+		const ISLANDS_PER_SIDE = 6;
+		const ISLAND_COUNT = 20;
+
+		const ISLAND_CELL_SIZE = CANVAS_SIDE_LENGTH / (ISLANDS_PER_SIDE + 2);
+
+		const islands = [];
+
+		class Island {
+			constructor(x, y) {
+				this.x = x;
+				this.y = y;
+				this.neighbors = []
+			}
+
+			addNeighbor(island) {
+				this.neighbors.push(island);
+			}
+		}
+
+		function setup() {
+			createCanvas(CANVAS_SIDE_LENGTH, CANVAS_SIDE_LENGTH);
+			background('lightblue');
+
+			var cells = Array(ISLANDS_PER_SIDE * ISLANDS_PER_SIDE).fill(undefined)
+			.map((_, i) => i)
+			.map(a => [Math.random(), a])
+			.sort((a, b) => a[0] - b[0])
+			.map(a => a[1]);
+			
+			var islandCells = cells.slice(0, ISLAND_COUNT);
+
+			islandCells.forEach((islandCell) => {
+				var islandX = Math.floor(islandCell / ISLANDS_PER_SIDE) * ISLAND_CELL_SIZE + ISLAND_CELL_SIZE;
+				var islandY = islandCell % ISLANDS_PER_SIDE * ISLAND_CELL_SIZE + ISLAND_CELL_SIZE;
+				islands.push(new Island(islandX, islandY));
+			});
+
+			islands.slice(0, islands.length -1).forEach((island, i) => {
+				var otherIslands = islands.slice(i + 1);
+				island.addNeighbor(otherIslands[Math.floor(random(0, otherIslands.length))])
+			});
+		}
+
+		function draw() {
+			drawBridges();
+			drawIslands();
+		}
+
+		function drawBridges() {
+			stroke('brown')
+			islands.forEach((island) => {
+				island.neighbors.forEach((neighbor) => {
+					line(island.x, island.y, neighbor.x, neighbor.y);
+				});
+			});
+		}
+
+		function drawIslands() {
+			noStroke()
+			fill('khaki');
+			islands.forEach((island) => {
+				ellipse(island.x, island.y, ISLAND_WIDTH, ISLAND_HEIGHT)
+			});
+		}
+
+	</script>
+</body>
+</html>
