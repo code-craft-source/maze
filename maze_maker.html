@@ -6,7 +6,7 @@
 <body>
 	<script type='text/javascript'>
 		const CANVAS_SIDE_LENGTH = 800;
-
+		const CANVAS_BUFFER = 50;
 		const ISLAND_WIDTH = 80;
 		const ISLAND_HEIGHT = 20;
 		const ISLAND_BUFFER = 10
@@ -14,9 +14,9 @@
 		const ISLANDS_PER_SIDE = 6;
 		const ISLAND_COUNT = 20;
 
-		const ISLAND_CELL_SIZE = CANVAS_SIDE_LENGTH / (ISLANDS_PER_SIDE + 2);
+		const ISLAND_CELL_SIZE = (CANVAS_SIDE_LENGTH - CANVAS_BUFFER * 2) / ISLANDS_PER_SIDE;
 
-		const islands = [];
+		let islands;
 
 		class Island {
 			constructor(x, y) {
@@ -34,24 +34,41 @@
 			createCanvas(CANVAS_SIDE_LENGTH, CANVAS_SIDE_LENGTH);
 			background('lightblue');
 
-			var cells = Array(ISLANDS_PER_SIDE * ISLANDS_PER_SIDE).fill(undefined)
-			.map((_, i) => i)
-			.map(a => [Math.random(), a])
-			.sort((a, b) => a[0] - b[0])
-			.map(a => a[1]);
-			
-			var islandCells = cells.slice(0, ISLAND_COUNT);
+			islands = Array(ISLANDS_PER_SIDE).fill(undefined).map((_,i) => {
+				return Array(ISLANDS_PER_SIDE).fill(undefined).map((_, j) => {
+					var islandX = i * ISLAND_CELL_SIZE + CANVAS_BUFFER;
+					var islandY = j * ISLAND_CELL_SIZE + CANVAS_BUFFER;
 
-			islandCells.forEach((islandCell) => {
-				var islandX = Math.floor(islandCell / ISLANDS_PER_SIDE) * ISLAND_CELL_SIZE + ISLAND_CELL_SIZE;
-				var islandY = islandCell % ISLANDS_PER_SIDE * ISLAND_CELL_SIZE + ISLAND_CELL_SIZE;
-				islands.push(new Island(islandX, islandY));
-			});
+					return new Island(islandX, islandY);
+				})
+			})
 
-			islands.slice(0, islands.length -1).forEach((island, i) => {
-				var otherIslands = islands.slice(i + 1);
-				island.addNeighbor(otherIslands[Math.floor(random(0, otherIslands.length))])
-			});
+			islands.forEach((islandRow, i) => {
+				islandRow.forEach((island, j) => {
+					var potentialNeighbors = []
+
+					if (i > 0 && islands[i - 1][j] && islands[i-1][j].neighbors.length === 0) {
+						potentialNeighbors.push(islands[i - 1][j]);
+					}
+
+					if (j > 0 && islands[i][j -1] && islands[i][j-1].neighbors.length === 0) {
+						potentialNeighbors.push(islands[i][j-1]);
+					}
+
+					if (i < islands.length -1 && islands[i + 1][j] && islands[i+1][j].neighbors.length === 0) {
+						potentialNeighbors.push(islands[i+1][j]);
+					}
+
+					if (j < islands.length - 1 &&islands[i][j +1] && islands[i][j+1].neighbors.length === 0) {
+						potentialNeighbors.push(islands[i][j+1]);
+					}
+
+					if (potentialNeighbors.length > 0) {
+						island.addNeighbor(potentialNeighbors[Math.floor(random(0, potentialNeighbors.length))])
+					}
+
+				})
+			})
 		}
 
 		function draw() {
@@ -60,10 +77,13 @@
 		}
 
 		function drawBridges() {
+			strokeWeight(5)
 			stroke('brown')
-			islands.forEach((island) => {
-				island.neighbors.forEach((neighbor) => {
-					line(island.x, island.y, neighbor.x, neighbor.y);
+			islands.forEach((islandRow) => {
+				islandRow.forEach((island) => {
+					island.neighbors.forEach((neighbor) => {
+						line(island.x, island.y, neighbor.x, neighbor.y)
+					})
 				});
 			});
 		}
@@ -71,8 +91,10 @@
 		function drawIslands() {
 			noStroke()
 			fill('khaki');
-			islands.forEach((island) => {
-				ellipse(island.x, island.y, ISLAND_WIDTH, ISLAND_HEIGHT)
+			islands.forEach((islandRow) => {
+				islandRow.forEach((island) => {
+					ellipse(island.x, island.y, ISLAND_WIDTH, ISLAND_HEIGHT)
+				})
 			});
 		}
 
