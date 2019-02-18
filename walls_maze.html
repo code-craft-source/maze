@@ -1,0 +1,38 @@
+<html>
+<head>
+	<!-- Import P5 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
+</head>
+<body>
+	<script type='text/javascript'>
+		var CANVAS_SIDE_LENGTH = 0;
+		var ROOMS_PER_EDGE = 8;
+
+		function setup() {
+			createCanvas(CANVAS_SIDE_LENGTH, CANVAS_SIDE_LENGTH);
+			background('lightblue');
+
+			grid = [];
+
+			for (var i = 0; i < ROOMS_PER_EDGE; i++) {
+				var row = []
+				for (var j = 0; j < ROOMS_PER_EDGE; j++) {
+					row.push({
+						hasNorthWall: true,
+						hasEastWall: true,
+						hasSouthWall: true,
+						hasWestWall: true,
+					});
+				}
+
+				grid.push(row);
+			}
+		}
+
+		function draw() {
+		}
+
+	</script>
+
+</body>
+</html>
