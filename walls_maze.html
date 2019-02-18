@@ -12,35 +12,32 @@
 		var visitedRooms;
 
 		function removeWall(i, j) {
-			if (visitedRooms.has(grid[i][j])) {
-				return;
-			}
-
 			visitedRooms.add(grid[i][j])
 
 			var directions = shuffle(Object.keys(grid[i][j]));
 
-			var wallToRemove = random(directions);
 
-			if (wallToRemove === 'hasNorthWall' && i > 0) {
-				grid[i][j][wallToRemove] = false;
-				grid[i - 1][j]['hasSouthWall'] = false;
-			}
-			
-			if (wallToRemove === 'hasSouthWall' && i < ROOMS_PER_EDGE - 1) {
-				grid[i][j][wallToRemove] = false;
-				grid[i + 1][j]['hasNorthWall'] = false;
-			}
+			directions.forEach((wallToRemove) => {
+				if (wallToRemove === 'hasNorthWall' && i > 0 && !visitedRooms.has(grid[i - 1][j])) {
+					grid[i][j][wallToRemove] = false;
+					grid[i - 1][j]['hasSouthWall'] = false;
+				}
 
-			if (wallToRemove === 'hasEastWall' && j < ROOMS_PER_EDGE - 1) {
-				grid[i][j][wallToRemove] = false;
-				grid[i][j + 1]['hasWestWall'] = false;
-			}
+				if (wallToRemove === 'hasSouthWall' && i < ROOMS_PER_EDGE - 1 && !visitedRooms.has(grid[i + 1][j])) {
+					grid[i][j][wallToRemove] = false;
+					grid[i + 1][j]['hasNorthWall'] = false;
+				}
 
-			if (wallToRemove === 'hasWestWall' && j > 0) {
-				grid[i][j][wallToRemove] = false;
-				grid[i][j - 1]['hasEastWall'] = false;
-			}
+				if (wallToRemove === 'hasEastWall' && j < ROOMS_PER_EDGE - 1&& !visitedRooms.has(grid[i][j + 1])) {
+					grid[i][j][wallToRemove] = false;
+					grid[i][j + 1]['hasWestWall'] = false;
+				}
+
+				if (wallToRemove === 'hasWestWall' && j > 0&& !visitedRooms.has(grid[i][j - 1])) {
+					grid[i][j][wallToRemove] = false;
+					grid[i][j - 1]['hasEastWall'] = false;
+				}
+			})
 		}
 
 		function setup() {
