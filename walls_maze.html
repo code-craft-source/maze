@@ -5,12 +5,13 @@
 </head>
 <body>
 	<script type='text/javascript'>
-		var CANVAS_SIDE_LENGTH = 0;
+		var CANVAS_SIDE_LENGTH = 800;
 		var ROOMS_PER_EDGE = 8;
+		var WALL_SIZE = CANVAS_SIDE_LENGTH / ROOMS_PER_EDGE;
 
 		function setup() {
 			createCanvas(CANVAS_SIDE_LENGTH, CANVAS_SIDE_LENGTH);
-			background('lightblue');
+			background('white');
 
 			grid = [];
 
@@ -30,6 +31,29 @@
 		}
 
 		function draw() {
+			strokeWeight(4)
+			grid.forEach((row, i) => {
+				row.forEach((room, j) => {
+					var topRightX = j * WALL_SIZE;
+					var topRightY = i * WALL_SIZE;
+
+					if (room.hasNorthWall) {
+						line(topRightX, topRightY, topRightX + WALL_SIZE, topRightY);
+					}
+
+					if (room.hasEastWall) {
+						line(topRightX + WALL_SIZE, topRightY, topRightX + WALL_SIZE, topRightY + WALL_SIZE);
+					}
+
+					if (room.hasSouthWall) {
+						line(topRightX, topRightY + WALL_SIZE, topRightX + WALL_SIZE, topRightY + WALL_SIZE);
+					}
+
+					if (room.hasWestWall) {
+						line(topRightX, topRightY, topRightX , topRightY + WALL_SIZE);
+					}
+				});
+			});
 		}
 
 	</script>
