@@ -12,6 +12,12 @@
 		var visitedRooms;
 
 		function removeWall(i, j) {
+			if (visitedRooms.has(grid[i][j])) {
+				return;
+			}
+
+			visitedRooms.add(grid[i][j])
+
 			var directions = shuffle(Object.keys(grid[i][j]));
 
 			var wallToRemove = random(directions);
