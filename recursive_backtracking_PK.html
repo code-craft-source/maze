@@ -1,0 +1,180 @@
+<html>
+<head>
+	<!-- Import P5 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
+</head>
+<body>
+
+
+
+
+	<script type='text/javascript'>
+
+/*
+
+1) Create one object called walls with all directions = true 
+
+	var walls = {
+			North: true,
+			East: true,
+			South: true,
+			Wwest: true,
+		};
+
+
+2) add to draw, draw walls from this object
+block for each wall: 
+if (walls.North = true) {
+
+}
+
+if (walls.South = true) {
+
+}
+
+3) change in object  to false to removde wall
+
+           walls.South = false
+
+4) Create 2D grid array - 3x3
+
+5) loop trough grid, push NEW  walls object into each cell
+
+
+6) move draw code into a function: drawWalls
+7) loop through grid, draw each square
+
+8) knock down a few walls
+
+9) start at 0,0, pick random wall and remove it, move to that cell.
+in a for while loop
+
+10)  Move this to a function, and call it from within itself. 
+You are doing recursion!
+
+
+*/
+
+
+	  var CANVAS_SIDE_LENGTH = 800;
+		var ISLANDS_PER_EDGE = 8;
+		var GRID_SIZE = 100;
+		var ISLAND_HEIGHT = 30;
+		var ISLAND_WIDTH = 50;
+		var TOTAL_LENGTH = GRID_SIZE * ISLANDS_PER_EDGE;
+		var grid;
+		var visited;
+		var I_CHANGE = {
+			N: 0,
+			E: 1,
+			S: 0,
+			W: -1,
+		};
+		var J_CHANGE = {
+			N: 1,
+			E: 0,
+			S: -1,
+			W: 0,
+		};
+		var OPPOSITE_DIRECTIONS = {
+			N: 'S',
+			E: 'W',
+			S: 'N',
+			W: 'E',
+		};
+
+		function buildBridges(i, j) {
+			visited.add(grid[i][j]);
+			// Shuffle the array, annoying to do in JS
+			var randomizedDirections = Object.keys(grid[i][j])
+			  .map(a => [Math.random(), a])
+			  .sort((a, b) => a[0] - b[0])
+			  .map(a => a[1]);
+
+			randomizedDirections.forEach((direction) => {
+				var neighbourI = i + I_CHANGE[direction];
+				var neighbourJ = j + J_CHANGE[direction];
+
+				// If the neighbour is on the grid
+				if (
+					neighbourI < ISLANDS_PER_EDGE && 
+					neighbourI >= 0 &&
+					neighbourJ < ISLANDS_PER_EDGE && 
+					neighbourJ >= 0
+					) {
+					// if the neighbour has not been visited - RECURSION
+					if (!visited.has(grid[neighbourI][neighbourJ])) {
+						var currentIsland = grid[i][j]
+						currentIsland[direction] = true;
+						grid[neighbourI][neighbourJ][OPPOSITE_DIRECTIONS[direction]] = true;
+						buildBridges(neighbourI, neighbourJ)
+					}
+				}
+			});
+		}
+
+		function setup() {
+			// Step one draw the background
+			createCanvas(CANVAS_SIDE_LENGTH, CANVAS_SIDE_LENGTH);
+			background('lightblue');
+
+			visited = new Set()
+			// Step two, create a grid
+			grid = [];
+
+			for (var i = 0; i < ISLANDS_PER_EDGE; i++) {
+				var row = []
+				for (var j = 0; j < ISLANDS_PER_EDGE; j++) {
+					row.push({
+						N: false,
+						E: false,
+						S: false,
+						W: false,
+					});
+				}
+
+				grid.push(row);
+			}
+
+			// Step four choose a random island
+			//why not start from 00
+			var randomI = Math.floor(random(0, ISLANDS_PER_EDGE));
+			var randomJ = Math.floor(random(0, ISLANDS_PER_EDGE));
+			buildBridges(randomI, randomJ)
+		}
+
+		function draw() {
+			// Draw Bridges
+			grid.forEach((row, i) => {
+				row.forEach((island, j) => {
+					Object.keys(island).forEach((direction) => {
+						if (island[direction]) {
+							var islandX = (CANVAS_SIDE_LENGTH / 2) + ((j - row.length / 2 + 0.5)* GRID_SIZE)
+							var islandY = (CANVAS_SIDE_LENGTH / 2) + ((i - grid.length / 2 + 0.5)* GRID_SIZE)
+
+							var neighbourX = (CANVAS_SIDE_LENGTH / 2) + ((j + J_CHANGE[direction] - row.length / 2 + 0.5)* GRID_SIZE)
+							var neighbourY = (CANVAS_SIDE_LENGTH / 2) + ((i + I_CHANGE[direction] - grid.length / 2 + 0.5)* GRID_SIZE)
+							strokeWeight(4);
+							line(islandX, islandY, neighbourX, neighbourY);
+						}
+					});
+				});
+			});
+
+			// Step three draw the islands
+			grid.forEach((row, i) => {
+				row.forEach((island, j) => {
+					var islandX = (CANVAS_SIDE_LENGTH / 2) + ((j - row.length / 2 + 0.5)* GRID_SIZE)
+					var islandY = (CANVAS_SIDE_LENGTH / 2) + ((i - grid.length / 2 + 0.5)* GRID_SIZE)
+					strokeWeight(1);
+					ellipse(islandX, islandY, ISLAND_WIDTH , ISLAND_HEIGHT);
+					textAlign(CENTER,CENTER);
+					text(`${i},${j}`, islandX, islandY);
+				});
+			});
+		}
+
+	</script>
+
+</body>
+</html>

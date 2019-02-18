@@ -12,92 +12,122 @@
 		const ISLAND_BUFFER = 10
 
 		const ISLANDS_PER_SIDE = 6;
-		const ISLAND_COUNT = 20;
+		const ISLAND_COUNT = ISLANDS_PER_SIDE * ISLANDS_PER_SIDE;
 
 		const ISLAND_CELL_SIZE = (CANVAS_SIDE_LENGTH - CANVAS_BUFFER * 2) / ISLANDS_PER_SIDE;
 
-		let islands;
+		let player;
 
-		class Island {
-			constructor(x, y) {
-				this.x = x;
-				this.y = y;
-				this.neighbors = []
-			}
-
-			addNeighbor(island) {
-				this.neighbors.push(island);
-			}
+		function displayPosition(index) {
+			return index * ISLAND_CELL_SIZE + CANVAS_BUFFER;
 		}
+
+		var bridges;
 
 		function setup() {
 			createCanvas(CANVAS_SIDE_LENGTH, CANVAS_SIDE_LENGTH);
 			background('lightblue');
 
-			islands = Array(ISLANDS_PER_SIDE).fill(undefined).map((_,i) => {
-				return Array(ISLANDS_PER_SIDE).fill(undefined).map((_, j) => {
-					var islandX = i * ISLAND_CELL_SIZE + CANVAS_BUFFER;
-					var islandY = j * ISLAND_CELL_SIZE + CANVAS_BUFFER;
+			islandBridges = Array(ISLAND_COUNT).fill(undefined).map((_,i) => { return [] });
 
-					return new Island(islandX, islandY);
-				})
-			})
+			islandBridges.forEach((bridges, i) => {
+				var neighbors = [];
+				var row = Math.floor(i / ISLANDS_PER_SIDE);
+				var col = i % ISLANDS_PER_SIDE;
 
-			islands.forEach((islandRow, i) => {
-				islandRow.forEach((island, j) => {
-					var potentialNeighbors = []
+				if (col < ISLANDS_PER_SIDE - 1) {
+					neighbors.push(i + 1);
+				}
 
-					if (i > 0 && islands[i - 1][j] && islands[i-1][j].neighbors.length === 0) {
-						potentialNeighbors.push(islands[i - 1][j]);
-					}
+				if (row < ISLANDS_PER_SIDE - 1) {
+					neighbors.push(i + ISLANDS_PER_SIDE);
+				}
 
-					if (j > 0 && islands[i][j -1] && islands[i][j-1].neighbors.length === 0) {
-						potentialNeighbors.push(islands[i][j-1]);
-					}
+				var newBridgeNeighbor = neighbors[Math.floor(random(0, neighbors.length))];
 
-					if (i < islands.length -1 && islands[i + 1][j] && islands[i+1][j].neighbors.length === 0) {
-						potentialNeighbors.push(islands[i+1][j]);
-					}
+				if (newBridgeNeighbor) {
+					bridges.push(newBridgeNeighbor);
+					islandBridges[newBridgeNeighbor].push(i)				
+				}
+			});
 
-					if (j < islands.length - 1 &&islands[i][j +1] && islands[i][j+1].neighbors.length === 0) {
-						potentialNeighbors.push(islands[i][j+1]);
-					}
-
-					if (potentialNeighbors.length > 0) {
-						island.addNeighbor(potentialNeighbors[Math.floor(random(0, potentialNeighbors.length))])
-					}
-
-				})
-			})
+			player = 0;
 		}
 
 		function draw() {
 			drawBridges();
 			drawIslands();
+			drawPlayer();
 		}
 
 		function drawBridges() {
 			strokeWeight(5)
 			stroke('brown')
-			islands.forEach((islandRow) => {
-				islandRow.forEach((island) => {
-					island.neighbors.forEach((neighbor) => {
-						line(island.x, island.y, neighbor.x, neighbor.y)
-					})
+			islandBridges.forEach((adjacentIslands, i) => {
+				var islandX = i % ISLANDS_PER_SIDE * ISLAND_CELL_SIZE + CANVAS_BUFFER;
+				var islandY = Math.floor(i / ISLANDS_PER_SIDE) * ISLAND_CELL_SIZE + CANVAS_BUFFER;
+
+				adjacentIslands.forEach((neighbor) => {
+					var neighborX = neighbor % ISLANDS_PER_SIDE * ISLAND_CELL_SIZE + CANVAS_BUFFER;
+					var neighborY = Math.floor(neighbor / ISLANDS_PER_SIDE) * ISLAND_CELL_SIZE + CANVAS_BUFFER;
+					line(islandX, islandY, neighborX, neighborY)
 				});
 			});
 		}
 
 		function drawIslands() {
 			noStroke()
-			fill('khaki');
-			islands.forEach((islandRow) => {
-				islandRow.forEach((island) => {
-					ellipse(island.x, island.y, ISLAND_WIDTH, ISLAND_HEIGHT)
-				})
-			});
+			for (var i = 0; i < ISLAND_COUNT; i++) {
+				var islandX = i % ISLANDS_PER_SIDE * ISLAND_CELL_SIZE + CANVAS_BUFFER;
+				var islandY = Math.floor(i / ISLANDS_PER_SIDE) * ISLAND_CELL_SIZE + CANVAS_BUFFER;
+
+				if (i === 0) {
+					fill('green');
+					ellipse(islandX, islandY, ISLAND_WIDTH + 10, ISLAND_HEIGHT + 10);
+				}
+
+				if (i === ISLAND_COUNT - 1) {
+					fill('red');
+					ellipse(islandX, islandY, ISLAND_WIDTH + 10, ISLAND_HEIGHT + 10);
+				}
+
+				fill('khaki');
+				ellipse(islandX, islandY, ISLAND_WIDTH, ISLAND_HEIGHT);
+			}
 		}
 
+		function drawPlayer() {
+			fill('black');
+			var playerX = player % ISLANDS_PER_SIDE * ISLAND_CELL_SIZE + CANVAS_BUFFER;
+			var playerY = Math.floor(player / ISLANDS_PER_SIDE) * ISLAND_CELL_SIZE + CANVAS_BUFFER;
+
+			ellipse(playerX, playerY, 10);
+		}
+
+		function keyPressed() {
+			console.log(key)
+			if (key === 'A') {
+				movePlayer(-1, 0);
+			}
+			if (key === 'D') {
+				movePlayer(1, 0);
+			}
+			if (key === 'S') {
+				movePlayer(0, 1);
+			}
+			if (key === 'W') {
+				movePlayer(0, -1);
+			}
+		}
+
+		function movePlayer(lr, ud) {
+			var targetIsland = player + lr + (ud * ISLANDS_PER_SIDE);
+
+			if (islandBridges[player].includes(targetIsland)) {
+				player = targetIsland;
+			}
+		}
 	</script>
+
 </body>
 </html>
