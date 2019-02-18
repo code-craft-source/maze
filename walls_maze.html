@@ -16,28 +16,37 @@
 
 			grid = [];
 
-			var room = {
-				hasNorthWall: true,
-				hasEastWall: true,
-				hasSouthWall: true,
-				hasWestWall: true,
+			for (var i = 0; i < ROOMS_PER_EDGE; i++) {
+				var row = []
+				for (var j = 0; j < ROOMS_PER_EDGE; j++) {
+					var newRoom = {
+						hasNorthWall: true,
+						hasEastWall: true,
+						hasSouthWall: true,
+						hasWestWall: true,
+					}
+
+					row.push(newRoom);
+				}
+
+				grid.push(row);
 			}
 
-			if (room.hasNorthWall) {
-				line(0, 0, WALL_SIZE, 0);
-			}
+			// if (room.hasNorthWall) {
+			// 	line(0, 0, WALL_SIZE, 0);
+			// }
 
-			if (room.hasEastWall) {
-				line(WALL_SIZE, 0, WALL_SIZE, WALL_SIZE);
-			}
+			// if (room.hasEastWall) {
+			// 	line(WALL_SIZE, 0, WALL_SIZE, WALL_SIZE);
+			// }
 
-			if (room.hasSouthWall) {
-				line(0, WALL_SIZE, WALL_SIZE, WALL_SIZE);
-			}
+			// if (room.hasSouthWall) {
+			// 	line(0, WALL_SIZE, WALL_SIZE, WALL_SIZE);
+			// }
 
-			if (room.hasWestWall) {
-				line(0, 0, 0 , WALL_SIZE);
-			}
+			// if (room.hasWestWall) {
+			// 	line(0, 0, 0 , WALL_SIZE);
+			// }
 		}
 	</script>
 
