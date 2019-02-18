@@ -21,21 +21,25 @@
 				if (wallToRemove === 'hasNorthWall' && i > 0 && !visitedRooms.has(grid[i - 1][j])) {
 					grid[i][j][wallToRemove] = false;
 					grid[i - 1][j]['hasSouthWall'] = false;
+					removeWall(i - 1, j);
 				}
 
 				if (wallToRemove === 'hasSouthWall' && i < ROOMS_PER_EDGE - 1 && !visitedRooms.has(grid[i + 1][j])) {
 					grid[i][j][wallToRemove] = false;
 					grid[i + 1][j]['hasNorthWall'] = false;
+					removeWall(i + 1, j);
 				}
 
 				if (wallToRemove === 'hasEastWall' && j < ROOMS_PER_EDGE - 1&& !visitedRooms.has(grid[i][j + 1])) {
 					grid[i][j][wallToRemove] = false;
 					grid[i][j + 1]['hasWestWall'] = false;
+					removeWall(i, j + 1);
 				}
 
 				if (wallToRemove === 'hasWestWall' && j > 0&& !visitedRooms.has(grid[i][j - 1])) {
 					grid[i][j][wallToRemove] = false;
 					grid[i][j - 1]['hasEastWall'] = false;
+					removeWall(i, j - 1);
 				}
 			})
 		}
