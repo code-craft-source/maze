@@ -14,41 +14,28 @@
 			background('white');
 
 			var room = {
-						hasNorthWall: true,
-						hasEastWall: true,
-						hasSouthWall: true,
-						hasWestWall: true,
+				hasNorthWall: true,
+				hasEastWall: true,
+				hasSouthWall: true,
+				hasWestWall: true,
 			}
 
-			
+			if (room.hasNorthWall) {
+				line(0, 0, WALL_SIZE, 0);
+			}
+
+			if (room.hasEastWall) {
+				line(WALL_SIZE, 0, WALL_SIZE, WALL_SIZE);
+			}
+
+			if (room.hasSouthWall) {
+				line(0, WALL_SIZE, WALL_SIZE, WALL_SIZE);
+			}
+
+			if (room.hasWestWall) {
+				line(0, 0, 0 , WALL_SIZE);
+			}
 		}
-
-		function draw() {
-			strokeWeight(4)
-			grid.forEach((row, i) => {
-				row.forEach((room, j) => {
-					var topRightX = j * WALL_SIZE;
-					var topRightY = i * WALL_SIZE;
-
-					if (room.hasNorthWall) {
-						line(topRightX, topRightY, topRightX + WALL_SIZE, topRightY);
-					}
-
-					if (room.hasEastWall) {
-						line(topRightX + WALL_SIZE, topRightY, topRightX + WALL_SIZE, topRightY + WALL_SIZE);
-					}
-
-					if (room.hasSouthWall) {
-						line(topRightX, topRightY + WALL_SIZE, topRightX + WALL_SIZE, topRightY + WALL_SIZE);
-					}
-
-					if (room.hasWestWall) {
-						line(topRightX, topRightY, topRightX , topRightY + WALL_SIZE);
-					}
-				});
-			});
-		}
-
 	</script>
 
 </body>
