@@ -9,6 +9,7 @@
 		var ROOMS_PER_EDGE = 8;
 		var WALL_SIZE = CANVAS_SIDE_LENGTH / ROOMS_PER_EDGE;
 		var grid;
+		var visitedRooms;
 
 		function removeWall(i, j) {
 			var directions = shuffle(Object.keys(grid[i][j]));
@@ -41,7 +42,7 @@
 			background('white');
 
 			grid = [];
-
+			visitedRooms = new Set();
 			for (var i = 0; i < ROOMS_PER_EDGE; i++) {
 				var row = []
 				for (var j = 0; j < ROOMS_PER_EDGE; j++) {
