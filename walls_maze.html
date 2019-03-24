@@ -11,6 +11,8 @@
 		var grid;
 		var visitedRooms;
 
+		var digSteps;
+
 		function removeWall(i, j) {
 			visitedRooms.add(grid[i][j])
 
@@ -19,26 +21,22 @@
 
 			directions.forEach((wallToRemove) => {
 				if (wallToRemove === 'hasNorthWall' && i > 0 && !visitedRooms.has(grid[i - 1][j])) {
-					grid[i][j][wallToRemove] = false;
-					grid[i - 1][j]['hasSouthWall'] = false;
+					digSteps.push([i, j, wallToRemove]);
 					removeWall(i - 1, j);
 				}
 
 				if (wallToRemove === 'hasSouthWall' && i < ROOMS_PER_EDGE - 1 && !visitedRooms.has(grid[i + 1][j])) {
-					grid[i][j][wallToRemove] = false;
-					grid[i + 1][j]['hasNorthWall'] = false;
+					digSteps.push([i, j, wallToRemove]);
 					removeWall(i + 1, j);
 				}
 
 				if (wallToRemove === 'hasEastWall' && j < ROOMS_PER_EDGE - 1&& !visitedRooms.has(grid[i][j + 1])) {
-					grid[i][j][wallToRemove] = false;
-					grid[i][j + 1]['hasWestWall'] = false;
+					digSteps.push([i, j, wallToRemove]);
 					removeWall(i, j + 1);
 				}
 
 				if (wallToRemove === 'hasWestWall' && j > 0&& !visitedRooms.has(grid[i][j - 1])) {
-					grid[i][j][wallToRemove] = false;
-					grid[i][j - 1]['hasEastWall'] = false;
+					digSteps.push([i, j, wallToRemove]);
 					removeWall(i, j - 1);
 				}
 			})
@@ -47,7 +45,7 @@
 		function setup() {
 			createCanvas(CANVAS_SIDE_LENGTH, CANVAS_SIDE_LENGTH);
 			background('white');
-
+			frameRate(4);
 			grid = [];
 			visitedRooms = new Set();
 			for (var i = 0; i < ROOMS_PER_EDGE; i++) {
@@ -66,10 +64,13 @@
 				grid.push(row);
 			}
 
+			digSteps = [];
 			removeWall(0,0)
 		}
 
 		function draw() {
+			background('white');
+
 			strokeWeight(4)
 			grid.forEach((row, i) => {
 				row.forEach((room, j) => {
@@ -93,6 +94,37 @@
 					}
 				});
 			});
+			var step = digSteps.shift();
+			if (!step) {
+				return;
+			}
+			
+			var i = step[0];
+			var j = step[1];
+			var wallToRemove = step[2];
+			strokeWeight(0)
+			fill(204, 101, 192, 127);
+			rect(j * WALL_SIZE, i * WALL_SIZE, WALL_SIZE, WALL_SIZE);
+
+			if (wallToRemove === 'hasNorthWall') {
+				grid[i][j][wallToRemove] = false;
+				grid[i - 1][j]['hasSouthWall'] = false;
+			}
+
+			if (wallToRemove === 'hasSouthWall') {
+				grid[i][j][wallToRemove] = false;
+				grid[i + 1][j]['hasNorthWall'] = false;
+			}
+
+			if (wallToRemove === 'hasEastWall') {
+				grid[i][j][wallToRemove] = false;
+				grid[i][j + 1]['hasWestWall'] = false;
+			}
+
+			if (wallToRemove === 'hasWestWall') {
+				grid[i][j][wallToRemove] = false;
+				grid[i][j - 1]['hasEastWall'] = false;
+			}
 		}
 	</script>
 
